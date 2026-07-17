@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>바이블트리 · 집중 묵상 시안</title>
+</head>
+<body>
+<style>
+  :root {
+    --leaf: #2f8a4c;
+    --leaf-deep: #1c5c33;
+    --leaf-bg: #e9f4ec;
+    --ink: #1d2622;
+    --ink-soft: #5a675f;
+    --paper: #f3f6f2;
+    --card: #ffffff;
+    --line: #dde5de;
+    --gold: #d9a13c;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --leaf: #5cb87a; --leaf-deep: #8fd3a6; --leaf-bg: #1c2b21;
+      --ink: #e6ece8; --ink-soft: #9fada5;
+      --paper: #10150f; --card: #1a211a; --line: #2b362f; --gold: #e0b25c;
+    }
+  }
+  :root[data-theme="dark"] {
+    --leaf: #5cb87a; --leaf-deep: #8fd3a6; --leaf-bg: #1c2b21;
+    --ink: #e6ece8; --ink-soft: #9fada5;
+    --paper: #10150f; --card: #1a211a; --line: #2b362f; --gold: #e0b25c;
+  }
+  :root[data-theme="light"] {
+    --leaf: #2f8a4c; --leaf-deep: #1c5c33; --leaf-bg: #e9f4ec;
+    --ink: #1d2622; --ink-soft: #5a675f;
+    --paper: #f3f6f2; --card: #ffffff; --line: #dde5de; --gold: #d9a13c;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--paper); color: var(--ink);
+    font-family: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", system-ui, sans-serif;
+    line-height: 1.75; -webkit-font-smoothing: antialiased;
+  }
+  .note {
+    max-width: 430px; margin: 18px auto 0; padding: 0 20px;
+    font-size: 12.5px; color: var(--ink-soft); text-align: center;
+  }
+  .phone {
+    max-width: 430px; margin: 10px auto 60px; background: var(--card);
+    border: 1px solid var(--line); border-radius: 22px; overflow: hidden;
+    min-height: 720px; display: flex; flex-direction: column;
+    box-shadow: 0 12px 40px rgba(20, 40, 25, .08);
+  }
+  /* ── top bar ── */
+  .top { padding: 16px 20px 0; }
+  .top .row { display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: var(--ink-soft); }
+  .top .row b { color: var(--ink); font-weight: 700; }
+  .chip { background: var(--leaf-bg); color: var(--leaf-deep); font-weight: 700; font-size: 12px; padding: 2px 10px; border-radius: 999px; }
+  .bar { height: 5px; background: var(--line); border-radius: 999px; margin: 12px 0 0; overflow: hidden; }
+  .bar i { display: block; height: 100%; width: 0%; background: var(--leaf); border-radius: 999px; transition: width .5s ease; }
+  .steps { display: flex; justify-content: space-between; margin: 8px 0 0; font-size: 11px; color: var(--ink-soft); letter-spacing: .02em; }
+  .steps span.on { color: var(--leaf); font-weight: 700; }
+  /* ── stage ── */
+  .stage { flex: 1; display: flex; flex-direction: column; padding: 24px 24px 20px; }
+  .screen { display: none; flex: 1; flex-direction: column; animation: fadein .45s ease; }
+  .screen.on { display: flex; }
+  @keyframes fadein { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) {
+    .screen { animation: none; } .bar i { transition: none; }
+    .breath { animation: none !important; } .fruit-pop { animation: none !important; }
+  }
+  .eyebrow { font-size: 12px; letter-spacing: .16em; font-weight: 800; color: var(--leaf); text-transform: uppercase; margin: 0 0 8px; }
+  h1 { font-size: 26px; font-weight: 800; letter-spacing: -0.02em; margin: 0 0 4px; line-height: 1.3; text-wrap: balance; }
+  h2 { font-size: 20px; font-weight: 800; margin: 0 0 14px; letter-spacing: -0.01em; }
+  .ref { color: var(--ink-soft); font-size: 14.5px; margin: 0 0 18px; }
+  .grow { flex: 1; }
+  /* ── intro breath ── */
+  .breathwrap { display: flex; flex-direction: column; align-items: center; gap: 18px; margin: 34px 0; }
+  .breath {
+    width: 96px; height: 96px; border-radius: 50%;
+    background: radial-gradient(circle at 38% 32%, var(--leaf-bg), transparent 70%), var(--leaf);
+    opacity: .9; animation: breathe 6s ease-in-out infinite;
+  }
+  @keyframes breathe { 0%,100% { transform: scale(.82); } 50% { transform: scale(1.08); } }
+  .breathhint { font-size: 14px; color: var(--ink-soft); text-align: center; }
+  /* ── verse reading ── */
+  .verse { display: grid; grid-template-columns: 26px 1fr; gap: 10px; padding: 12px 12px; border-radius: 12px; cursor: pointer; transition: background .25s; font-size: 16.5px; line-height: 1.85; }
+  .verse .vn { color: var(--leaf); font-weight: 800; font-size: 13px; padding-top: 5px; font-variant-numeric: tabular-nums; }
+  .verse.read { background: var(--leaf-bg); }
+  .readhint { font-size: 13px; color: var(--ink-soft); margin: 10px 0 4px; text-align: center; }
+  /* ── commentary pager ── */
+  .para { font-size: 16px; line-height: 1.9; margin: 0; }
+  .para b { color: var(--leaf-deep); }
+  .pgdots { display: flex; gap: 6px; justify-content: center; margin: 20px 0 4px; }
+  .pgdots i { width: 7px; height: 7px; border-radius: 50%; background: var(--line); }
+  .pgdots i.on { background: var(--leaf); }
+  .wordcard { background: var(--leaf-bg); border-radius: 12px; padding: 12px 16px; margin-bottom: 10px; font-size: 14.5px; }
+  .wordcard b { color: var(--leaf-deep); }
+  /* ── question ── */
+  .qno { font-size: 13px; font-weight: 700; color: var(--leaf); margin-bottom: 6px; }
+  .qtext { font-size: 18px; font-weight: 700; line-height: 1.55; margin: 0 0 16px; text-wrap: balance; }
+  textarea {
+    width: 100%; min-height: 130px; border: 1.5px solid var(--line); border-radius: 14px;
+    background: var(--paper); color: var(--ink); font: inherit; font-size: 15px;
+    padding: 14px 16px; resize: vertical; outline: none;
+  }
+  textarea:focus { border-color: var(--leaf); }
+  .hint {
+    margin-top: 14px; background: var(--leaf-bg); border-radius: 12px;
+    padding: 14px 16px; font-size: 14px; line-height: 1.8; color: var(--ink);
+  }
+  .hint b { color: var(--leaf-deep); }
+  .hintlabel { font-size: 12px; font-weight: 800; letter-spacing: .04em; color: var(--leaf-deep); margin-bottom: 6px; }
+  /* ── prayer ── */
+  .prayer { font-size: 16.5px; line-height: 2.0; background: var(--leaf-bg); border-radius: 16px; padding: 22px 22px; margin: 0; }
+  /* ── done ── */
+  .done { text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; }
+  .tree { font-size: 64px; line-height: 1; }
+  .fruit-pop { display: inline-block; animation: pop .6s cubic-bezier(.2,1.6,.4,1) .2s both; }
+  @keyframes pop { from { transform: scale(0); } to { transform: scale(1); } }
+  .streak { margin: 16px 0 4px; font-size: 15px; }
+  .streak b { color: var(--leaf); }
+  .week { display: flex; gap: 8px; justify-content: center; margin: 14px 0 6px; }
+  .day { width: 34px; text-align: center; font-size: 11px; color: var(--ink-soft); }
+  .day i { display: block; width: 26px; height: 26px; margin: 4px auto 0; border-radius: 50%; border: 1.5px dashed var(--line); }
+  .day.full i { background: var(--leaf); border: none; position: relative; }
+  .day.full i::after { content: "✓"; color: #fff; font-size: 13px; line-height: 26px; }
+  .day.today i { background: var(--gold); border: none; }
+  .day.today i::after { content: "🍎"; font-size: 13px; line-height: 26px; }
+  /* ── buttons ── */
+  .actions { padding-top: 18px; display: flex; gap: 10px; }
+  button {
+    flex: 1; font: inherit; font-size: 15.5px; font-weight: 700; border: none; cursor: pointer;
+    border-radius: 14px; padding: 14px 18px; transition: transform .15s, opacity .15s;
+  }
+  button:active { transform: scale(.98); }
+  .primary { background: var(--leaf); color: #fff; }
+  .primary:disabled { opacity: .35; cursor: default; }
+  .ghost { background: transparent; color: var(--ink-soft); flex: 0 0 auto; padding: 14px 14px; }
+  .secondary { background: var(--leaf-bg); color: var(--leaf-deep); }
+  button:focus-visible { outline: 2.5px solid var(--leaf); outline-offset: 2px; }
+</style>
+
+<p class="note">인터랙티브 시안 — 실제 7월 17일 고학년 큐티 콘텐츠로 만든 "집중 묵상 모드" 목업입니다. 버튼을 눌러 진행해보세요.</p>
+
+<div class="phone">
+  <div class="top">
+    <div class="row">
+      <span><b>7월 17일 금요일</b></span>
+      <span class="chip">고학년</span>
+    </div>
+    <div class="bar"><i id="fill"></i></div>
+    <div class="steps" id="steplabels">
+      <span>준비</span><span>단어</span><span>말씀</span><span>묵상</span><span>기록</span><span>기도</span><span>열매</span>
+    </div>
+  </div>
+
+  <div class="stage">
+
+    <!-- 0. 준비 -->
+    <section class="screen on" data-step="0">
+      <p class="eyebrow">오늘의 말씀</p>
+      <h1>위로의 하나님</h1>
+      <p class="ref">고린도후서 1:3–7</p>
+      <div class="grow">
+        <div class="breathwrap">
+          <div class="breath" aria-hidden="true"></div>
+          <p class="breathhint">잠시 눈을 감고 숨을 고르며<br>마음을 하나님께로 모아요.</p>
+        </div>
+      </div>
+      <div class="actions"><button class="primary" data-next>마음이 준비됐어요</button></div>
+    </section>
+
+    <!-- 1. 어려운 단어 미리 알기 -->
+    <section class="screen" data-step="1">
+      <h2>먼저 단어를 알아두어요</h2>
+      <p class="ref">오늘 말씀에 이런 단어들이 나와요.</p>
+      <div class="grow">
+        <div class="wordcard"><b>환난</b> — 어렵고 고통스러운 상황이에요. 바울은 환난 속에서도 하나님의 위로가 있음을 경험했어요.</div>
+        <div class="wordcard"><b>자비</b> — 불쌍히 여기고 도와주려는 따뜻한 마음이에요. 하나님의 자비는 우리 실패와 고통에도 변함없어요.</div>
+        <div class="wordcard"><b>위로</b> — 힘들고 슬픈 사람의 마음을 편안하게 해주는 것이에요. 하나님의 위로는 상황을 넘어서는 깊은 안위예요.</div>
+      </div>
+      <div class="actions">
+        <button class="ghost" data-back>←</button>
+        <button class="primary" data-next>이제 말씀 읽으러 가요</button>
+      </div>
+    </section>
+
+    <!-- 2. 말씀 읽기 -->
+    <section class="screen" data-step="2">
+      <h2>말씀을 천천히 읽어요</h2>
+      <div class="grow" id="verses">
+        <div class="verse"><span class="vn">3</span><span>찬송하리로다 그는 우리 주 예수 그리스도의 하나님이시요 자비의 아버지시요 모든 위로의 하나님이시며</span></div>
+        <div class="verse"><span class="vn">4</span><span>우리의 모든 환난 중에서 우리를 위로하사 우리로 하여금 하나님께 받는 위로로써 모든 환난 중에 있는 자들을 능히 위로하게 하시는 이시로다</span></div>
+        <div class="verse"><span class="vn">5</span><span>그리스도의 고난이 우리에게 넘친것 같이 우리의 위로도 그리스도로 말미암아 넘치는도다</span></div>
+        <div class="verse"><span class="vn">6</span><span>우리가 환난 받는 것도 너희의 위로와 구원을 위함이요 혹 위로 받는 것도 너희의 위로를 위함이니 이 위로가 너희 속에 역사하여 우리가 받는것 같은 고난을 너희도 견디게 하느니라</span></div>
+        <div class="verse"><span class="vn">7</span><span>너희를 위한 우리의 소망이 견고함은 너희가 고난에 참예하는 자가 된것 같이 위로에도 그러할 줄을 앎이라</span></div>
+        <p class="readhint">한 절씩 읽으면서 눌러 표시해보세요 🌿</p>
+      </div>
+      <div class="actions">
+        <button class="ghost" data-back>←</button>
+        <button class="primary" id="readBtn" data-next disabled>다 읽었어요 (0/5)</button>
+      </div>
+    </section>
+
+    <!-- 3. 묵상 해설 (3쪽) -->
+    <section class="screen" data-step="3">
+      <h2>말씀 안으로 들어가요</h2>
+      <div class="grow">
+        <p class="para" id="para"></p>
+        <div class="pgdots" id="pgdots"><i class="on"></i><i></i><i></i></div>
+      </div>
+      <div class="actions">
+        <button class="ghost" data-back>←</button>
+        <button class="primary" id="paraBtn">다음</button>
+      </div>
+    </section>
+
+    <!-- 4. 기록 -->
+    <section class="screen" data-step="4">
+      <h2>나의 묵상 기록</h2>
+      <div class="grow">
+        <p class="qno" id="qno">질문 1 / 3</p>
+        <p class="qtext" id="qtext"></p>
+        <textarea id="qinput" placeholder="천천히 생각하고 적어보세요..."></textarea>
+        <div class="hint" id="qhint"></div>
+      </div>
+      <div class="actions">
+        <button class="ghost" data-back>←</button>
+        <button class="primary" id="qBtn">다음 질문</button>
+      </div>
+    </section>
+
+    <!-- 5. 기도 -->
+    <section class="screen" data-step="5">
+      <h2>함께 기도해요</h2>
+      <div class="grow">
+        <p class="prayer">"하나님, 당신은 모든 위로의 하나님이세요. 제가 힘들었을 때 당신의 위로가 저를 세워주었어요. 그 위로를 받은 자로서 오늘 누군가에게 흘려보내는 사람이 되게 해 주세요. 그리스도의 고난이 넘친 것같이 위로도 넘치게 하심을 믿으며, 오늘 하루 위로의 통로가 되게 해 주세요. 아멘."</p>
+      </div>
+      <div class="actions">
+        <button class="ghost" data-back>←</button>
+        <button class="primary" data-next>아멘 🙏</button>
+      </div>
+    </section>
+
+    <!-- 6. 완료 -->
+    <section class="screen" data-step="6">
+      <div class="done">
+        <div class="tree">🌳<span class="fruit-pop">🍎</span></div>
+        <p class="streak"><b>4일 연속</b> 묵상하고 있어요!<br>오늘의 열매가 나무에 맺혔어요.</p>
+        <div class="week">
+          <div class="day full">일<i></i></div>
+          <div class="day">월<i></i></div>
+          <div class="day full">화<i></i></div>
+          <div class="day full">수<i></i></div>
+          <div class="day full">목<i></i></div>
+          <div class="day today">금<i></i></div>
+          <div class="day">토<i></i></div>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="secondary">말씀 카드 공유</button>
+        <button class="primary">기록 저장하기</button>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<script>
+(function () {
+  var step = 0, TOTAL = 7;
+  var screens = document.querySelectorAll('.screen');
+  var labels = document.querySelectorAll('#steplabels span');
+  var fill = document.getElementById('fill');
+
+  function show(n) {
+    step = n;
+    screens.forEach(function (s) { s.classList.toggle('on', +s.dataset.step === n); });
+    labels.forEach(function (l, i) { l.classList.toggle('on', i === n); });
+    fill.style.width = ((n) / (TOTAL - 1) * 100) + '%';
+  }
+  document.querySelectorAll('[data-next]').forEach(function (b) {
+    b.addEventListener('click', function () { show(Math.min(step + 1, TOTAL - 1)); });
+  });
+  document.querySelectorAll('[data-back]').forEach(function (b) {
+    b.addEventListener('click', function () { show(Math.max(step - 1, 0)); });
+  });
+
+  /* 말씀 읽기 체크 */
+  var readCount = 0;
+  var readBtn = document.getElementById('readBtn');
+  document.querySelectorAll('#verses .verse').forEach(function (v) {
+    v.addEventListener('click', function () {
+      v.classList.toggle('read');
+      readCount = document.querySelectorAll('#verses .verse.read').length;
+      readBtn.textContent = readCount >= 5 ? '다 읽었어요 ✓' : '다 읽었어요 (' + readCount + '/5)';
+      readBtn.disabled = readCount < 5;
+    });
+  });
+
+  /* 해설 페이지 */
+  var paras = [
+    '고린도후서 1장은 위로에 대한 놀라운 선언으로 시작해요. 하나님은 <b>\'모든 위로의 하나님\'</b>이에요. 환난 중에 하나님이 위로하시는 이유가 있어요. 그 위로를 받은 우리가 다른 환난 당한 사람들을 위로할 수 있도록 하기 위해서예요. 우리가 받은 위로는 우리만을 위한 것이 아니에요. 흘려보내기 위해 주어진 거예요.',
+    '바울은 \'그리스도의 고난이 넘치면 우리의 위로도 그리스도로 말미암아 넘친다\'고 해요. 고난이 크면 위로도 크다는 말이에요. 예수님은 십자가에서 가장 깊은 고난을 당하셨어요. 그래서 그분이 주시는 위로는 어떤 인간의 위로보다 <b>깊고 충분해요</b>. 우리는 그 위로의 원천에 연결되어 있어요.',
+    '우리가 누군가를 위로할 수 있는 것은 내가 강해서가 아니에요. <b>먼저 위로받았기 때문</b>이에요. 예수님의 고난과 부활이 가져다 준 위로를 내가 먼저 경험하고, 그것을 흘려보내는 것이 그리스도인의 격려예요. 오늘 내가 받은 위로를 한 사람에게 나누어 줄 수 있을까요?'
+  ];
+  var pi = 0;
+  var para = document.getElementById('para');
+  var dots = document.querySelectorAll('#pgdots i');
+  var paraBtn = document.getElementById('paraBtn');
+  function renderPara() {
+    para.innerHTML = paras[pi];
+    dots.forEach(function (d, i) { d.classList.toggle('on', i === pi); });
+    paraBtn.textContent = pi === paras.length - 1 ? '기록하러 가기' : '다음';
+  }
+  renderPara();
+  paraBtn.addEventListener('click', function () {
+    if (pi < paras.length - 1) { pi++; renderPara(); }
+    else { show(4); }
+  });
+
+  /* 질문 — 질문마다 참고 자료를 함께 보여줌 */
+  var qs = [
+    {
+      q: '하나님이 우리를 위로하시는 목적은 무엇인가요? (4절)',
+      hintLabel: '📖 4절 다시 보기',
+      hint: '<b>4</b> 우리의 모든 환난 중에서 우리를 위로하사 우리로 하여금 하나님께 받는 위로로써 모든 환난 중에 있는 자들을 능히 위로하게 하시는 이시로다'
+    },
+    {
+      q: '내가 힘들었을 때 받은 위로 중에 가장 기억에 남는 것은 무엇인가요?',
+      hintLabel: '💡 해설에서 힌트',
+      hint: '예수님은 십자가에서 가장 깊은 고난을 당하셨어요. 그래서 그분이 주시는 위로는 어떤 인간의 위로보다 깊고 충분해요. 우리는 그 위로의 원천에 연결되어 있어요.'
+    },
+    {
+      q: '오늘 내가 받은 위로를 나누어 줄 수 있는 한 사람은 누구인가요?',
+      hintLabel: '💡 해설에서 힌트',
+      hint: '우리가 받은 위로는 우리만을 위한 것이 아니에요. 흘려보내기 위해 주어진 거예요. 내가 먼저 경험한 위로를 흘려보내는 것이 그리스도인의 격려예요.'
+    }
+  ];
+  var qi = 0;
+  var answers = ['', '', ''];
+  var qno = document.getElementById('qno'), qtext = document.getElementById('qtext'),
+      qinput = document.getElementById('qinput'), qBtn = document.getElementById('qBtn'),
+      qhint = document.getElementById('qhint');
+  function renderQ() {
+    qno.textContent = '질문 ' + (qi + 1) + ' / 3';
+    qtext.textContent = qs[qi].q;
+    qinput.value = answers[qi];
+    qhint.innerHTML = '<div class="hintlabel">' + qs[qi].hintLabel + '</div>' + qs[qi].hint;
+    qBtn.textContent = qi === qs.length - 1 ? '기도하러 가기' : '다음 질문';
+  }
+  renderQ();
+  qBtn.addEventListener('click', function () {
+    answers[qi] = qinput.value;
+    if (qi < qs.length - 1) { qi++; renderQ(); }
+    else { show(5); }
+  });
+})();
+</script>
+</body>
+</html>
