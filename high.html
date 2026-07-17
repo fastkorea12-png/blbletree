@@ -59,6 +59,8 @@
   .bar { height: 5px; background: var(--line); border-radius: 999px; margin: 12px 0 0; overflow: hidden; }
   .bar i { display: block; height: 100%; width: 0%; background: var(--leaf); border-radius: 999px; transition: width .5s ease; }
   .steps { display: flex; justify-content: space-between; margin: 8px 0 0; font-size: 11px; color: var(--ink-soft); letter-spacing: .02em; }
+  .steps span { cursor: pointer; padding: 2px 3px; border-radius: 6px; transition: color .15s; }
+  .steps span:hover { color: var(--leaf); }
   .steps span.on { color: var(--leaf); font-weight: 700; }
   /* ── stage ── */
   .stage { flex: 1; display: flex; flex-direction: column; padding: 24px 24px 20px; }
@@ -273,6 +275,9 @@
   var screens = document.querySelectorAll('.screen');
   var labels = document.querySelectorAll('#steplabels span');
   var fill = document.getElementById('fill');
+  labels.forEach(function (l, i) {
+    l.addEventListener('click', function () { show(i); });
+  });
 
   function show(n) {
     step = n;
