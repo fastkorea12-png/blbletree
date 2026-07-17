@@ -40,6 +40,7 @@
     margin: 0; background: var(--paper); color: var(--ink);
     font-family: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", system-ui, sans-serif;
     line-height: 1.75; -webkit-font-smoothing: antialiased;
+    word-break: keep-all; overflow-wrap: break-word;
   }
   .note {
     max-width: 430px; margin: 18px auto 0; padding: 0 20px;
@@ -88,6 +89,7 @@
   .openprayer {
     background: var(--leaf-bg); border-radius: 14px; padding: 14px 18px;
     font-size: 14.5px; line-height: 1.9; text-align: center; margin: 0; max-width: 320px;
+    text-wrap: balance;
   }
   /* ── verse reading ── */
   .verse { display: grid; grid-template-columns: 26px 1fr; gap: 10px; padding: 12px 12px; border-radius: 12px; cursor: pointer; transition: background .25s; font-size: 16.5px; line-height: 1.85; }
@@ -178,7 +180,7 @@
         <div class="breathwrap">
           <div class="breath" aria-hidden="true"></div>
           <p class="breathhint">잠시 눈을 감고 숨을 고르며<br>마음을 하나님께로 모아요.</p>
-          <p class="openprayer">"성령님, 오늘 말씀을 잘 알 수 있도록 도와주세요.<br>제 마음을 조용하게 해 주세요. 아멘."</p>
+          <p class="openprayer">"성령님, 오늘 말씀을 잘 알 수 있도록 도와주세요. 제 마음을 조용하게 해 주세요. 아멘."</p>
         </div>
       </div>
       <div class="actions"><button class="primary" data-next>마음이 준비됐어요</button></div>
