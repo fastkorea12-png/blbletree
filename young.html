@@ -105,7 +105,7 @@
   .wordcard { background: var(--leaf-bg); border-radius: 12px; padding: 12px 16px; margin-bottom: 10px; font-size: 14.5px; }
   .wordcard b { color: var(--leaf-deep); display: block; margin-bottom: 2px; }
   .para.show { animation: fadein .45s ease; }
-  #paraArea, #prayArea { touch-action: pan-y; }
+  #paraArea, #prayArea { touch-action: pan-y; -webkit-user-select: none; user-select: none; }
   /* ── question ── */
   .qnav { display: flex; gap: 7px; margin-bottom: 10px; }
   .qnum {
@@ -121,12 +121,17 @@
     padding: 14px 16px; resize: vertical; outline: none;
   }
   textarea:focus { border-color: var(--leaf); }
-  .hint {
-    margin-top: 14px; background: var(--leaf-bg); border-radius: 12px;
-    padding: 14px 16px; font-size: 14px; line-height: 1.8; color: var(--ink);
-  }
+  .hint { margin-top: 14px; background: var(--leaf-bg); border-radius: 12px; overflow: hidden; }
   .hint b { color: var(--leaf-deep); }
-  .hintlabel { font-size: 12px; font-weight: 800; letter-spacing: .04em; color: var(--leaf-deep); margin-bottom: 6px; }
+  .hinthead {
+    flex: none; width: 100%; display: flex; align-items: center; justify-content: space-between;
+    background: transparent; border-radius: 0; padding: 12px 16px; text-align: left;
+    font-size: 12px; font-weight: 800; letter-spacing: .04em; color: var(--leaf-deep);
+  }
+  .hinthead .arrow { font-size: 11px; transition: transform .25s; }
+  .hint.open .hinthead .arrow { transform: rotate(180deg); }
+  .hintbody { display: none; padding: 0 16px 14px; font-size: 14px; line-height: 1.8; color: var(--ink); }
+  .hint.open .hintbody { display: block; }
   /* ── prayer ── */
   .prayer { font-size: 16.5px; line-height: 2.0; background: var(--leaf-bg); border-radius: 16px; padding: 22px 22px; margin: 0; }
   /* ── done ── */
@@ -401,10 +406,14 @@
     qnums.forEach(function (b, i) { b.classList.toggle('on', i === qi); });
     qtext.textContent = qs[qi].q;
     qinput.value = answers[qi];
-    qhint.innerHTML = '<div class="hintlabel">' + qs[qi].hintLabel + '</div>' + qs[qi].hint;
+    qhint.classList.remove('open');
+    qhint.innerHTML = '<button type="button" class="hinthead"><span>' + qs[qi].hintLabel + '</span><span class="arrow">▾</span></button><div class="hintbody">' + qs[qi].hint + '</div>';
     qBtn.textContent = qi === qs.length - 1 ? '기도하러 가기' : '다음 질문';
   }
   renderQ();
+  qhint.addEventListener('click', function (e) {
+    if (e.target.closest('.hinthead')) qhint.classList.toggle('open');
+  });
   qnums.forEach(function (b, i) {
     b.addEventListener('click', function () {
       answers[qi] = qinput.value;
@@ -445,25 +454,45 @@
     else { show(6); }
   });
 
-  /* 스와이프로 해설·기도 슬라이드 넘기기 */
-  function addSwipe(el, onPrev, onNext) {
-    var sx = null, sy = null;
-    el.addEventListener('pointerdown', function (e) { sx = e.clientX; sy = e.clientY; });
-    el.addEventListener('pointercancel', function () { sx = sy = null; });
-    el.addEventListener('pointerup', function (e) {
+  /* 드래그를 따라 움직이는 슬라이드 (해설·기도) */
+  function makeSlider(area, content, canPrev, canNext, onPrev, onNext) {
+    var sx = null, sy = null, dragging = false;
+    function reset() {
+      content.style.transition = ''; content.style.transform = ''; content.style.opacity = '';
+      sx = sy = null; dragging = false;
+    }
+    area.addEventListener('pointerdown', function (e) {
+      sx = e.clientX; sy = e.clientY; dragging = false;
+      if (area.setPointerCapture) { try { area.setPointerCapture(e.pointerId); } catch (err) {} }
+    });
+    area.addEventListener('pointermove', function (e) {
       if (sx === null) return;
       var dx = e.clientX - sx, dy = e.clientY - sy;
-      sx = sy = null;
-      if (Math.abs(dx) < 44 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
-      if (dx < 0) onNext(); else onPrev();
+      if (!dragging) {
+        if (Math.abs(dx) > 8 && Math.abs(dx) > Math.abs(dy)) dragging = true;
+        else return;
+      }
+      if ((dx > 0 && !canPrev()) || (dx < 0 && !canNext())) dx = dx / 3;
+      content.style.transition = 'none';
+      content.style.transform = 'translateX(' + dx + 'px)';
+      content.style.opacity = String(Math.max(.25, 1 - Math.abs(dx) / 320));
     });
+    area.addEventListener('pointerup', function (e) {
+      if (sx === null) return;
+      var dx = e.clientX - sx, moved = dragging;
+      reset();
+      if (!moved) return;
+      if (dx > 56 && canPrev()) onPrev();
+      else if (dx < -56 && canNext()) onNext();
+    });
+    area.addEventListener('pointercancel', reset);
   }
-  addSwipe(document.getElementById('paraArea'),
-    function () { if (pi > 0) { pi--; renderPara(); } },
-    function () { if (pi < paras.length - 1) { pi++; renderPara(); } });
-  addSwipe(document.getElementById('prayArea'),
-    function () { if (pri > 0) { pri--; renderPray(); } },
-    function () { if (pri < prays.length - 1) { pri++; renderPray(); } });
+  makeSlider(document.getElementById('paraArea'), para,
+    function () { return pi > 0; }, function () { return pi < paras.length - 1; },
+    function () { pi--; renderPara(); }, function () { pi++; renderPara(); });
+  makeSlider(document.getElementById('prayArea'), prayline,
+    function () { return pri > 0; }, function () { return pri < prays.length - 1; },
+    function () { pri--; renderPray(); }, function () { pri++; renderPray(); });
 })();
 </script>
 </body>
