@@ -95,7 +95,7 @@
   .verse { display: grid; grid-template-columns: 26px 1fr; gap: 10px; padding: 12px 12px; border-radius: 12px; cursor: pointer; transition: background .25s; font-size: 16.5px; line-height: 1.85; }
   .verse .vn { color: var(--leaf); font-weight: 800; font-size: 13px; padding-top: 5px; font-variant-numeric: tabular-nums; }
   .verse.read { background: var(--leaf-bg); }
-  .readhint { font-size: 13px; color: var(--ink-soft); margin: 10px 0 4px; text-align: center; }
+  .readhint { font-size: 13px; color: var(--ink-soft); margin: -4px 0 12px; text-align: center; }
   /* ── commentary pager ── */
   .para { font-size: 16px; line-height: 1.9; margin: 0; }
   .para b { color: var(--leaf-deep); }
@@ -103,7 +103,9 @@
   .pgdots i { width: 7px; height: 7px; border-radius: 50%; background: var(--line); }
   .pgdots i.on { background: var(--leaf); }
   .wordcard { background: var(--leaf-bg); border-radius: 12px; padding: 12px 16px; margin-bottom: 10px; font-size: 14.5px; }
-  .wordcard b { color: var(--leaf-deep); }
+  .wordcard b { color: var(--leaf-deep); display: block; margin-bottom: 2px; }
+  .para.show { animation: fadein .45s ease; }
+  #paraArea, #prayArea { touch-action: pan-y; }
   /* ── question ── */
   .qnav { display: flex; gap: 7px; margin-bottom: 10px; }
   .qnum {
@@ -163,7 +165,21 @@
     display: flex; align-items: center; justify-content: center;
   }
   .prayline.show { animation: fadein .6s ease; }
-  @media (prefers-reduced-motion: reduce) { .prayline.show { animation: none; } }
+  @media (prefers-reduced-motion: reduce) { .prayline.show, .para.show { animation: none; } }
+
+  /* ── 가로모드 ── */
+  @media (orientation: landscape) and (max-height: 640px) {
+    .note { max-width: 760px; }
+    .phone { max-width: 760px; min-height: calc(100svh - 70px); margin: 8px auto 30px; }
+    .stage { padding: 16px 32px 14px; }
+    .breathwrap { margin: 14px 0; gap: 12px; }
+    .breath { width: 60px; height: 60px; }
+    .breath.small { width: 48px; height: 48px; }
+    .prayfocus { gap: 12px; }
+    .prayline { min-height: 3em; }
+    textarea { min-height: 84px; }
+    .tree { font-size: 52px; }
+  }
 </style>
 
 <p class="note">인터랙티브 시안 — 실제 7월 17일 청년 큐티 콘텐츠로 만든 "집중 묵상 모드" 목업입니다. 버튼을 눌러 진행해 보십시오.</p>
@@ -202,8 +218,8 @@
       <h2>먼저 단어를 짚어봅니다</h2>
       <p class="ref">오늘 본문의 핵심 단어입니다.</p>
       <div class="grow">
-        <div class="wordcard"><b>자비의 아버지</b> — 고통받는 자를 긍휼히 여기시는 하나님의 성품입니다. 히브리 전통의 라함(태의 사랑)과 연결되는 깊은 애정입니다.</div>
-        <div class="wordcard"><b>환난</b> — 외부적 압박이나 시련을 가리킵니다. 신앙을 흔드는 어려움이지만 동시에 하나님의 위로를 경험하는 자리입니다.</div>
+        <div class="wordcard"><b>자비의 아버지</b>고통받는 자를 긍휼히 여기시는 하나님의 성품입니다. 히브리 전통의 라함(태의 사랑)과 연결되는 깊은 애정입니다.</div>
+        <div class="wordcard"><b>환난</b>외부적 압박이나 시련을 가리킵니다. 신앙을 흔드는 어려움이지만 동시에 하나님의 위로를 경험하는 자리입니다.</div>
       </div>
       <div class="actions">
         <button class="ghost" data-back>←</button>
@@ -214,13 +230,13 @@
     <!-- 2. 말씀 읽기 -->
     <section class="screen" data-step="2">
       <h2>말씀을 천천히 읽습니다</h2>
+      <p class="readhint">한 절씩 읽으며 눌러 표시해 보십시오 🌿</p>
       <div class="grow" id="verses">
         <div class="verse"><span class="vn">3</span><span>찬송하리로다 그는 우리 주 예수 그리스도의 하나님이시요 자비의 아버지시요 모든 위로의 하나님이시며</span></div>
         <div class="verse"><span class="vn">4</span><span>우리의 모든 환난 중에서 우리를 위로하사 우리로 하여금 하나님께 받는 위로로써 모든 환난 중에 있는 자들을 능히 위로하게 하시는 이시로다</span></div>
         <div class="verse"><span class="vn">5</span><span>그리스도의 고난이 우리에게 넘친것 같이 우리의 위로도 그리스도로 말미암아 넘치는도다</span></div>
         <div class="verse"><span class="vn">6</span><span>우리가 환난 받는 것도 너희의 위로와 구원을 위함이요 혹 위로 받는 것도 너희의 위로를 위함이니 이 위로가 너희 속에 역사하여 우리가 받는것 같은 고난을 너희도 견디게 하느니라</span></div>
         <div class="verse"><span class="vn">7</span><span>너희를 위한 우리의 소망이 견고함은 너희가 고난에 참예하는 자가 된것 같이 위로에도 그러할 줄을 앎이라</span></div>
-        <p class="readhint">한 절씩 읽으며 눌러 표시해 보십시오 🌿</p>
       </div>
       <div class="actions">
         <button class="ghost" data-back>←</button>
@@ -231,7 +247,7 @@
     <!-- 3. 묵상 해설 (3쪽) -->
     <section class="screen" data-step="3">
       <h2>말씀 안으로 들어갑니다</h2>
-      <div class="grow">
+      <div class="grow" id="paraArea">
         <p class="para" id="para"></p>
         <div class="pgdots" id="pgdots"><i class="on"></i><i></i><i></i></div>
       </div>
@@ -263,7 +279,7 @@
     <!-- 5. 기도 -->
     <section class="screen" data-step="5">
       <h2>함께 기도합니다</h2>
-      <div class="grow prayfocus">
+      <div class="grow prayfocus" id="prayArea">
         <div class="breath small" aria-hidden="true"></div>
         <p class="prayline show" id="prayline"></p>
         <div class="pgdots" id="praydots"></div>
@@ -345,7 +361,10 @@
   var dots = document.querySelectorAll('#pgdots i');
   var paraBtn = document.getElementById('paraBtn');
   function renderPara() {
+    para.classList.remove('show');
+    void para.offsetWidth;
     para.innerHTML = paras[pi];
+    para.classList.add('show');
     dots.forEach(function (d, i) { d.classList.toggle('on', i === pi); });
     paraBtn.textContent = pi === paras.length - 1 ? '묵상 기록하기' : '다음';
   }
@@ -425,6 +444,26 @@
     if (pri < prays.length - 1) { pri++; renderPray(); }
     else { show(6); }
   });
+
+  /* 스와이프로 해설·기도 슬라이드 넘기기 */
+  function addSwipe(el, onPrev, onNext) {
+    var sx = null, sy = null;
+    el.addEventListener('pointerdown', function (e) { sx = e.clientX; sy = e.clientY; });
+    el.addEventListener('pointercancel', function () { sx = sy = null; });
+    el.addEventListener('pointerup', function (e) {
+      if (sx === null) return;
+      var dx = e.clientX - sx, dy = e.clientY - sy;
+      sx = sy = null;
+      if (Math.abs(dx) < 44 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+      if (dx < 0) onNext(); else onPrev();
+    });
+  }
+  addSwipe(document.getElementById('paraArea'),
+    function () { if (pi > 0) { pi--; renderPara(); } },
+    function () { if (pi < paras.length - 1) { pi++; renderPara(); } });
+  addSwipe(document.getElementById('prayArea'),
+    function () { if (pri > 0) { pri--; renderPray(); } },
+    function () { if (pri < prays.length - 1) { pri++; renderPray(); } });
 })();
 </script>
 </body>
