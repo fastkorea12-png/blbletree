@@ -43,6 +43,8 @@
   .youth { border-left-color: var(--blue); } .youth .chip { background: var(--blue-bg); color: var(--blue); }
   .young { border-left-color: var(--purple); } .young .chip { background: var(--purple-bg); color: var(--purple); }
   .high { border-left-color: var(--green); } .high .chip { background: var(--green-bg); color: var(--green); }
+  .records { border-left-color: #8a6d3b; } .records .chip { background: #f1e8d4; color: #8a6d3b; }
+  @media (prefers-color-scheme: dark) { .records { border-left-color: #c9a86a; } .records .chip { background: #2e2717; color: #c9a86a; } }
   .pending {
     background: transparent; border: 1.5px dashed var(--line); border-radius: 16px;
     padding: 16px 20px; color: var(--ink-soft); font-size: 13.5px; text-align: center; margin-bottom: 12px;
@@ -74,6 +76,12 @@
     <span class="chip">고학년</span>
     <p class="t">위로의 하나님 <span style="font-weight:400;font-size:13px;color:var(--ink-soft)">(초기 시안 · 참고용)</span></p>
     <p class="r">청소년·청년 버전의 원형이 된 첫 시안</p>
+  </a>
+
+  <a class="card records" href="records.html">
+    <span class="chip">기록</span>
+    <p class="t">나의 묵상 기록 📖</p>
+    <p class="r">저장한 기록을 다시 읽는 서재 모드 시안</p>
   </a>
 
   <p class="foot">Bibletree × HEM — 큐티 상세 페이지 리뉴얼 목업</p>
